@@ -1,5 +1,6 @@
 streamlit
-pandas 
+pandas
 py3Dmol
-stmol 
+stmol
 matplotlib
+ipywidgets
