@@ -1,7 +1,0 @@
-streamlit
-pandas 
-itertools
-py3Dmol
-stmol 
-matplotlib
-io
