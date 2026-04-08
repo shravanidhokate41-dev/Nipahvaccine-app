@@ -1,7 +1,0 @@
-streamlit
-pandas
-py3Dmol
-stmol
-matplotlib
-ipywidgets
-biopython
