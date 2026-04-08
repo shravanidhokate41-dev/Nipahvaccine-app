@@ -1,6 +1,7 @@
 streamlit
 pandas
-py3Dmol==2.0.4
-stmol==0.0.9
+py3Dmol
+stmol
 matplotlib
 ipywidgets
+biopython
