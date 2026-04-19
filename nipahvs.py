@@ -4,7 +4,7 @@ import itertools
 import matplotlib.pyplot as plt
 import io
 
-# ✅ SAFE IMPORT (FIXED)
+
 try:
     import py3Dmol
     from stmol import showmol
@@ -19,9 +19,7 @@ plt.rcParams.update({
     'font.size': 8
 })
 
-# =========================
-# STYLE
-# =========================
+
 st.markdown("""
 <style>
 .stButton>button {
@@ -36,28 +34,22 @@ h1, h2, h3 {
 </style>
 """, unsafe_allow_html=True)
 
-# =========================
-# LOAD DATA
-# =========================
+
 @st.cache_data
 def load_data():
     return pd.read_csv("nipah_dataset1.csv")
 
 df = load_data()
 
-# =========================
-# SIDEBAR
-# =========================
+
 st.sidebar.title("Navigation")
 page = st.sidebar.radio("Go to", [
     "Home","Tool","Vaccine Pipeline",
-    "Advanced Analytics","Export Results",
-    "About","Team"
+    "Export Results",
+    "Team"
 ])
 
-# =========================
-# HOME
-# =========================
+
 if page == "Home":
     st.title("Nipah Virus Vaccine Design Platform")
     st.markdown("### Computational Immunoinformatics-Based Vaccine Development System")
@@ -82,9 +74,7 @@ if page == "Home":
     7. Final Selection  
     """)
 
-# =========================
-# TOOL
-# =========================
+
 if page == "Tool":
     st.title("Tool Description")
 
@@ -121,9 +111,7 @@ if page == "Tool":
 
     st.success("Output: Ranked vaccine candidates for further validation")
 
-# =========================
-# PIPELINE
-# =========================
+
 if page == "Vaccine Pipeline":
 
     st.title("Vaccine Design Pipeline")
@@ -141,11 +129,16 @@ if page == "Vaccine Pipeline":
     if "Subcellular_Location" in df_protein.columns:
         fig, ax = plt.subplots(figsize=(3.5,2.2))
         df_protein["Subcellular_Location"].value_counts().plot(kind='bar', ax=ax)
+
+        ax.set_xlabel("Subcellular Location")
+        ax.set_ylabel("Frequency")
+        ax.set_title("Distribution of Subcellular Localization")
+
         st.pyplot(fig)
 
         buf = io.BytesIO()
         fig.savefig(buf, format="png")
-        st.download_button("Download Graph", buf.getvalue(), "localization.png")
+        st.download_button("Download Localization Graph", buf.getvalue(), "localization.png")
 
     # 3D STRUCTURE
     st.header("Protein Structure")
@@ -182,7 +175,17 @@ if page == "Vaccine Pipeline":
     if "filtered" in st.session_state:
         fig, ax = plt.subplots(figsize=(3.5,2.2))
         ax.hist(st.session_state["filtered"]["Antigenicity"])
+
+        ax.set_xlabel("Antigenicity Score")
+        ax.set_ylabel("Number of Epitopes")
+        ax.set_title("Antigenicity Distribution")
+
         st.pyplot(fig)
+
+     
+        buf = io.BytesIO()
+        fig.savefig(buf, format="png")
+        st.download_button("Download Antigenicity Histogram", buf.getvalue(), "antigenicity.png")
 
     # FILTER
     st.header("3. Filtering")
@@ -231,29 +234,8 @@ if page == "Vaccine Pipeline":
             st.success("Best Vaccine Candidate")
             st.write(best)
 
-# =========================
-# ADVANCED
-# =========================
-if page == "Advanced Analytics":
-    st.title("Advanced Analysis")
 
-    if "filtered" in st.session_state:
-        data = st.session_state["filtered"]
 
-        fig, ax = plt.subplots(figsize=(4,3))
-        corr = data.select_dtypes(include='number').corr()
-        cax = ax.matshow(corr, cmap="viridis")
-        fig.colorbar(cax)
-
-        st.pyplot(fig)
-
-        buf = io.BytesIO()
-        fig.savefig(buf, format="png")
-        st.download_button("Download Correlation Matrix", buf.getvalue(), "correlation.png")
-
-# =========================
-# EXPORT
-# =========================
 if page == "Export Results":
     st.title("Export Data")
 
@@ -266,25 +248,14 @@ if page == "Export Results":
         csv2 = vacc_df.to_csv(index=False).encode()
         st.download_button("Download Vaccines", csv2, "vaccines.csv")
 
-# =========================
-# ABOUT
-# =========================
-if page == "About":
-    st.title("About Project")
 
-    st.write("""
-    This project demonstrates computational vaccine design using immunoinformatics techniques.
-    It accelerates vaccine discovery using in-silico filtering and analysis.
-    """)
 
-# =========================
-# TEAM
-# =========================
+
 if page == "Team":
     st.title("Project Team")
 
     st.write("""
-    Developer: Shravani Dhokate  
+    Developer: Shravani Vinod Dhokate  
     Academic Guide: Dr. Kushagra Kashyap  
     Program: MSc Bioinformatics  
     Domain: Immunoinformatics & Computational Biology  
