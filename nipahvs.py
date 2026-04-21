@@ -4,7 +4,6 @@ import itertools
 import matplotlib.pyplot as plt
 import io
 
-
 try:
     import py3Dmol
     from stmol import showmol
@@ -14,26 +13,37 @@ except:
 
 st.set_page_config(layout="wide")
 
-plt.rcParams.update({
-    'figure.autolayout': True,
-    'font.size': 8
-})
-
 
 st.markdown("""
 <style>
+body {
+    background-color: #F4F6F7;
+}
+[data-testid="stAppViewContainer"] {
+    background: linear-gradient(135deg, #e3f2fd, #fce4ec);
+}
 .stButton>button {
-    border-radius: 8px;
-    background-color: #2E86C1;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #2E86C1, #48C9B0);
     color: white;
-    font-weight: 500;
+    font-weight: 600;
+    border: none;
 }
 h1, h2, h3 {
     color: #1B4F72;
 }
+.stDataFrame {
+    background-color: white;
+    border-radius: 10px;
+}
 </style>
 """, unsafe_allow_html=True)
 
+
+plt.rcParams.update({
+    'figure.autolayout': True,
+    'font.size': 8
+})
 
 @st.cache_data
 def load_data():
@@ -49,16 +59,13 @@ page = st.sidebar.radio("Go to", [
     "Team"
 ])
 
-
 if page == "Home":
     st.title("Nipah Virus Vaccine Design Platform")
     st.markdown("### Computational Immunoinformatics-Based Vaccine Development System")
     st.markdown("---")
 
     st.subheader("Overview")
-    st.info("""
-    This platform is designed for in-silico multi-epitope vaccine design targeting the Nipah virus.
-    """)
+    st.info("This platform is designed for in-silico multi-epitope vaccine design targeting the Nipah virus.")
 
     st.subheader("Why Nipah Virus?")
     st.write("High mortality zoonotic virus. Computational methods accelerate vaccine discovery.")
@@ -77,22 +84,18 @@ if page == "Home":
 
 if page == "Tool":
     st.title("Tool Description")
-
     st.markdown("---")
 
     st.subheader("Overview")
-    st.write("""
-    This application is a Streamlit-based computational platform designed for 
-    multi-epitope vaccine design against Nipah virus using immunoinformatics approaches.
-    """)
+    st.write("Streamlit-based platform for multi-epitope vaccine design using immunoinformatics.")
 
     st.subheader("Methodology")
     st.write("""
     - Protein Selection  
-    - Antigenicity-based screening  
-    - Epitope classification (B-cell / T-cell)  
-    - Filtering based on affinity and conservation  
-    - Vaccine construction using linkers  
+    - Antigenicity Screening  
+    - Epitope Classification  
+    - Filtering  
+    - Vaccine Construction  
     """)
 
     st.subheader("Key Parameters")
@@ -104,12 +107,7 @@ if page == "Tool":
     - Conservation  
     """)
 
-    st.subheader("Technologies Used")
-    st.write("""
-    Streamlit, Pandas, Matplotlib, Py3Dmol, Stmol
-    """)
-
-    st.success("Output: Ranked vaccine candidates for further validation")
+    st.success("Output: Ranked vaccine candidates")
 
 
 if page == "Vaccine Pipeline":
@@ -125,20 +123,24 @@ if page == "Vaccine Pipeline":
     df_protein = df[df["Protein"] == protein]
     st.dataframe(df_protein)
 
-    # GRAPH
+    # GRAPH 1 (COLORED BAR)
     if "Subcellular_Location" in df_protein.columns:
-        fig, ax = plt.subplots(figsize=(3.5,2.2))
-        df_protein["Subcellular_Location"].value_counts().plot(kind='bar', ax=ax)
+        fig, ax = plt.subplots(figsize=(4,2.5))
+        df_protein["Subcellular_Location"].value_counts().plot(
+            kind='bar',
+            ax=ax,
+            color=['#5DADE2','#48C9B0','#AF7AC5','#F5B041']
+        )
 
-        ax.set_xlabel("Subcellular Location")
-        ax.set_ylabel("Frequency")
-        ax.set_title("Distribution of Subcellular Localization")
+        ax.set_xlabel("Location")
+        ax.set_ylabel("Count")
+        ax.set_title("Subcellular Localization")
 
         st.pyplot(fig)
 
         buf = io.BytesIO()
         fig.savefig(buf, format="png")
-        st.download_button("Download Localization Graph", buf.getvalue(), "localization.png")
+        st.download_button("Download Graph", buf.getvalue(), "localization.png")
 
     # 3D STRUCTURE
     st.header("Protein Structure")
@@ -156,8 +158,8 @@ if page == "Vaccine Pipeline":
                     view.zoomTo()
                     showmol(view, height=350)
                 else:
-                    st.warning("⚠️ 3D structure not supported here")
-                    st.markdown(f"🔗 https://www.rcsb.org/structure/{selected_pdb}")
+                    st.warning("3D not supported")
+                    st.markdown(f"https://www.rcsb.org/structure/{selected_pdb}")
 
     # PRE-SCREENING
     st.header("2. Pre-Screening")
@@ -172,20 +174,24 @@ if page == "Vaccine Pipeline":
         st.session_state["filtered"] = filtered
         st.dataframe(filtered)
 
+    # GRAPH 2 (COLORED HIST)
     if "filtered" in st.session_state:
-        fig, ax = plt.subplots(figsize=(3.5,2.2))
-        ax.hist(st.session_state["filtered"]["Antigenicity"])
+        fig, ax = plt.subplots(figsize=(4,2.5))
+        ax.hist(
+            st.session_state["filtered"]["Antigenicity"],
+            color="#48C9B0",
+            edgecolor="black"
+        )
 
-        ax.set_xlabel("Antigenicity Score")
-        ax.set_ylabel("Number of Epitopes")
+        ax.set_xlabel("Antigenicity")
+        ax.set_ylabel("Count")
         ax.set_title("Antigenicity Distribution")
 
         st.pyplot(fig)
 
-     
         buf = io.BytesIO()
         fig.savefig(buf, format="png")
-        st.download_button("Download Antigenicity Histogram", buf.getvalue(), "antigenicity.png")
+        st.download_button("Download Histogram", buf.getvalue(), "antigenicity.png")
 
     # FILTER
     st.header("3. Filtering")
@@ -235,13 +241,12 @@ if page == "Vaccine Pipeline":
             st.write(best)
 
 
-
 if page == "Export Results":
     st.title("Export Data")
 
     if "final" in st.session_state:
         csv = st.session_state["final"].to_csv(index=False).encode()
-        st.download_button("Download Final Epitopes", csv, "epitopes.csv")
+        st.download_button("Download Epitopes", csv, "epitopes.csv")
 
     if "vaccines" in st.session_state:
         vacc_df = pd.DataFrame([v for _, v in st.session_state["vaccines"]], columns=["Sequence"])
@@ -249,10 +254,8 @@ if page == "Export Results":
         st.download_button("Download Vaccines", csv2, "vaccines.csv")
 
 
-
-
 if page == "Team":
-    st.title("Project Team")
+    st.title(" Project Team")
 
     st.write("""
     Developer: Shravani Vinod Dhokate  
